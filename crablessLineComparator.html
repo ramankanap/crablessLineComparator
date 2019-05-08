@@ -1,0 +1,167 @@
+<meta charset='UTF-8'>
+<!--
+name: crablessLineComparator
+license: public domain
+version: 2019-05-07
+-->
+<div style='background-color: black; padding: 0.5%;'>
+<textarea id='listA' placeholder='List A' style='width: 32%; height: 24%;'></textarea>
+<textarea id='listB' placeholder='List B' style='width: 32%; height: 24%;'></textarea>
+<textarea id='comparisonResult' placeholder='Comparison result' style='width: 32%; height: 24%;'></textarea>
+<select id='operationSelector' title='Action' style='margin: 1%'>
+<option value='lineComparisonDuplicatesInListA'>Line comparison: find duplicate lines in list A</option>
+<option value='lineComparisonUniquesInListA'>Line comparison: find unique lines in list A</option>
+<option value='listComparisonUniqueToListA'>List comparison: find lines unique to list A</option>
+<option value='listComparisonUniqueToListB'>List comparison: find lines unique to list B</option>
+<option value='normaliseLowercase'>Normalise lists A and B: convert to lowercase</option>
+<option value='normaliseAlphaDashSpace'>Normalise lists A and B: leave only English alphabetic characters, dashes and spaces</option>
+<option value='normaliseRemoveDigits'>Normalise lists A and B: remove digits</option>
+<option value='normaliseSort'>Normalise lists A and B: sort</option>
+</select>
+<button onclick='proceed()' style='margin: 1%; width: 256px; height: 64px; background-color: sandyBrown;'>Proceed</button>
+</div>
+
+<script>
+function proceed() {
+    //initializing the variables and clearing the comparison result
+    var comparisonResult = [];
+    document.getElementById('comparisonResult').value = '';
+
+    switch(document.getElementById('operationSelector').value) {
+        case 'lineComparisonDuplicatesInListA':
+            lineComparisonDuplicatesInListA();
+            break;
+        case 'lineComparisonUniquesInListA':
+            lineComparisonUniquesInListA();
+            break;
+        case 'listComparisonUniqueToListA':
+            listComparisonUniqueToListA();
+            break;
+        case 'listComparisonUniqueToListB':
+            listComparisonUniqueToListB();
+            break;
+        case 'normaliseAlphaDashSpace':
+            normaliseAlphaDashSpace();
+            break;
+        case 'normaliseLowercase':
+            normaliseLowercase();
+            break;
+        case 'normaliseRemoveDigits':
+            normaliseRemoveDigits();
+            break;
+        case 'normaliseSort':
+            normaliseSort();
+            break;
+    }
+
+function lineComparisonDuplicatesInListA() {
+    var transformedInputArray = document.getElementById('listA').value.split('\n');
+    for (var currentLineOfFullPass = 0; currentLineOfFullPass < transformedInputArray.length; currentLineOfFullPass++) {
+        var currentLineContentHolder = transformedInputArray[currentLineOfFullPass];
+        var numberOfOccurences = 0;
+        for (var i = 0; i < transformedInputArray.length; i++) {
+            if (transformedInputArray[i] == currentLineContentHolder) {
+                numberOfOccurences++;
+                if (numberOfOccurences > 1) {
+                    if (comparisonResult.indexOf(currentLineContentHolder) < 0) {
+                        comparisonResult.push(currentLineContentHolder);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+}
+
+function lineComparisonUniquesInListA() {
+    var transformedInputArray = document.getElementById('listA').value.split('\n');
+    comparisonResult = transformedInputArray.slice();
+    for (var currentLineOfFullPass = 0; currentLineOfFullPass < transformedInputArray.length; currentLineOfFullPass++) {
+        var currentLineContentHolder = transformedInputArray[currentLineOfFullPass];
+        var numberOfOccurences = 0;
+        for (var i = 0; i < comparisonResult.length; i++) {
+            if (comparisonResult[i] == currentLineContentHolder) {
+                numberOfOccurences++;
+                if (numberOfOccurences > 1) {
+                    while (comparisonResult.indexOf(currentLineContentHolder) >= 0) {
+                        comparisonResult.splice(comparisonResult.indexOf(currentLineContentHolder), 1);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+}
+
+function listComparisonUniqueToListA() {
+    var transformedInputArrayFromA = document.getElementById('listA').value.split('\n');
+    var transformedInputArrayFromB = document.getElementById('listB').value.split('\n');
+    comparisonResult = transformedInputArrayFromA.slice();
+    for (var currentLineOfFullPass = 0; currentLineOfFullPass < transformedInputArrayFromA.length; currentLineOfFullPass++) {
+        var currentLineContentHolder = transformedInputArrayFromA[currentLineOfFullPass];
+        for (var i = 0; i < transformedInputArrayFromB.length; i++) {
+            if (transformedInputArrayFromB[i] == currentLineContentHolder) {
+                while (comparisonResult.indexOf(currentLineContentHolder) >= 0) {
+                    comparisonResult.splice(comparisonResult.indexOf(currentLineContentHolder), 1);
+                }
+                break;
+            }
+        }
+    }
+}
+
+function listComparisonUniqueToListB() {
+    var transformedInputArrayFromA = document.getElementById('listA').value.split('\n');
+    var transformedInputArrayFromB = document.getElementById('listB').value.split('\n');
+    comparisonResult = transformedInputArrayFromB.slice();
+    for (var currentLineOfFullPass = 0; currentLineOfFullPass < transformedInputArrayFromB.length; currentLineOfFullPass++) {
+        var currentLineContentHolder = transformedInputArrayFromB[currentLineOfFullPass];
+        for (var i = 0; i < transformedInputArrayFromA.length; i++) {
+            if (transformedInputArrayFromA[i] == currentLineContentHolder) {
+                while (comparisonResult.indexOf(currentLineContentHolder) >= 0) {
+                    comparisonResult.splice(comparisonResult.indexOf(currentLineContentHolder), 1);
+                }
+                break;
+            }
+        }
+    }
+}
+
+function normaliseAlphaDashSpace() {
+    document.getElementById('listA').value = document.getElementById('listA').value.replace(/[^a-zA-Z\-\‒\–\—\―\ \n]/g, '');
+    document.getElementById('listB').value = document.getElementById('listB').value.replace(/[^a-zA-Z\-\‒\–\—\―\ \n]/g, '');
+}
+
+function normaliseLowercase() {
+    document.getElementById('listA').value = document.getElementById('listA').value.toLowerCase();
+    document.getElementById('listB').value = document.getElementById('listB').value.toLowerCase();
+}
+
+function normaliseRemoveDigits() {
+    document.getElementById('listA').value = document.getElementById('listA').value.replace(/[0-9]/g, '');
+    document.getElementById('listB').value = document.getElementById('listB').value.replace(/[0-9]/g, '');
+}
+
+function normaliseSort() {
+    var transformedInputArray = document.getElementById('listA').value.split('\n');
+    transformedInputArray = transformedInputArray.sort();
+    document.getElementById('listA').value = convertArrayToString(transformedInputArray);
+    transformedInputArray = document.getElementById('listB').value.split('\n');
+    transformedInputArray = transformedInputArray.sort();
+    document.getElementById('listB').value = convertArrayToString(transformedInputArray);
+}
+
+function convertArrayToString(inputArray) {
+    var stringForResult = '';
+    for (var i = 0; i < inputArray.length; i++) {
+        stringForResult += inputArray[i] + '\n';
+    }
+    //removing a redundant newline at the end
+    stringForResult = stringForResult.slice(0, stringForResult.length - 1);
+    return stringForResult;
+}
+
+    document.getElementById('comparisonResult').value = convertArrayToString(comparisonResult);
+
+}
+</script>
